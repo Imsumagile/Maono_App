@@ -35,7 +35,9 @@ export async function GET(request: NextRequest) {
     const db = app.firestore();
     // CRON_SECRET is used for basic security to ensure only authorized callers trigger this
     const authHeader = request.headers.get('authorization');
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    const isVercelCron = request.headers.get('x-vercel-cron') === '1';
+
+    if (!isVercelCron && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
